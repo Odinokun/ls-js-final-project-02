@@ -1,0 +1,155 @@
+.map {
+  width: 100%;
+  height: 100%;
+  opacity: .5;
+  background-color: #000;
+}
+.popup {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  width: 380px;
+  height: 530px;
+  margin: auto;
+  border-radius: 10px;
+  background-color: #fff;
+}
+.popup-header {
+  display: flex;
+  padding: 15px;
+  background-color: #ff8663;
+}
+.popup-header__baloon {
+  margin-right: 5px;
+  svg {
+    display: block;
+    fill: #fff;
+    width: 20px;
+    height: 20px;
+  }
+}
+.popup-header__title {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  margin-right: auto;
+  color: #fff;
+  text-decoration: underline;
+  &:hover {
+    text-decoration: none;
+  }
+}
+.popup-header__close {
+  flex: none;
+  margin-left: 10px;
+  svg {
+    display: block;
+    fill: #fff;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    transition: transform .5s;
+  }
+  &:hover {
+    svg {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+// begin reviews
+.reviews {
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 160px;
+  padding: 15px 15px 0 15px;
+}
+.reviews-item {
+  margin-bottom: 15px;
+}
+.reviews-item__header {
+  display: flex;
+  align-items: baseline;
+}
+.reviews-item__name {
+  font-size: 16px;
+  font-weight: 600;
+  flex: none;
+  width: 110px;
+  font-style: italic;
+  padding-right: 5px;
+  color: #4f4f4f;
+}
+.reviews-item__place {
+  font-weight: 600;
+  font-size: 16px;
+  flex: none;
+  max-width: 140px;
+  color: #4f4f4f;
+}
+.reviews-item__time {
+  font-size: 14px;
+  flex: none;
+  width: 80px;
+  padding-left: 5px;
+  color: #4f4f4f;
+}
+.reviews-item__text {
+  color: #4f4f4f;
+  font-size: 15px;
+  padding-top: 5px;
+}
+// end reviews
+// begin reviews-form
+.reviews-form__wrap {
+  position: relative;
+  padding: 15px;
+  &::before {
+    position: absolute;
+    top: 0;
+    right: 15px;
+    left: 15px;
+    height: 1px;
+    content: '';
+    background-color: #f0f0f0;
+  }
+}
+.reviews-form__title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  color: #ff8663;
+}
+.reviews-form {
+  display: flex;
+  flex-direction: column;
+  input,
+  textarea {
+    font-family: BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 7px 15px;
+    resize: none;
+    border: 1px solid #c4c4c4;
+    border-radius: 15px;
+    background-color: #fff;
+  }
+  textarea {
+    height: 100px;
+  }
+}
+.reviews-form__btn {
+  margin-left: auto;
+  padding: 7px 18px;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  background-color: #ff8663;
+}
+// end reviews-form
