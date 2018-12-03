@@ -18,6 +18,8 @@ const init = () => {
     myMap.events.add('click', async e => {
         const coords = e.get('coords');
         const coordsPosition = e.get('position');
+        
+        console.log(e);
 
         // открываем попап
         createPopup(coordsPosition[0], coordsPosition[1], popup);
@@ -39,9 +41,10 @@ const init = () => {
 
         // geocode (адрес по клику)
         const data = await ymaps.geocode(coords);
-        let address = data.geoObjects.get(0).properties.get('metaDataProperty').GeocoderMetaData.Address.formatted;
+        const popupHeaderTitle = document.getElementById('popup-header__title');
+        const address = data.geoObjects.get(0).properties.get('metaDataProperty').GeocoderMetaData.Address.formatted;
 
-        console.log(data.geoObjects.get(0).properties.get('metaDataProperty').GeocoderMetaData.Address.formatted);
+        popupHeaderTitle.innerText = address;
 
     });
 };
