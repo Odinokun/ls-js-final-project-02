@@ -51,19 +51,20 @@ const init = () => {
         // наполняем попап отзывами
         reviews.innerHTML = reviewsListFn({ reviewsList: reviewsArr }); /////////temp!!!!!!!!!!!!!!!!!!
 
-        const placemark = new ymaps.Placemark(coords);
 
         // прослушка клика на маркере
-        placemark.events.add('click', e => {
-            console.log(e);
-        });
-
-        // добавляем иконку на карту
-        // addBtn.addEventListener('click', e => {
-        //     e.preventDefault();
+        // placemark.events.add('click', e => {
+        //     console.log(e);
         // });
 
-        myMap.geoObjects.add(placemark);
+        // добавляем иконку на карту
+        addBtn.addEventListener('click', e => {
+            e.preventDefault();
+
+            const placemark = new ymaps.Placemark(coords);
+            myMap.geoObjects.add(placemark);
+        });
+
 
         // geocode (адрес по клику)
         const data = await ymaps.geocode(coords);
