@@ -10,7 +10,7 @@ function createPopup(coordsX, coordsY, popup) {
         coordsY = clientHeight - 570;
     }
 
-    popup.style.display = 'block';
+    popup.classList.add('active');
     popup.style.left = coordsX + 'px';
     popup.style.top = coordsY + 'px';
 }

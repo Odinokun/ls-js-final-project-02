@@ -1,11 +1,38 @@
 // инклюдим js файлы
 import { createPopup } from './js/funcs';
 
+// инклюдим функцию хендлбарса
+import reviewsListFn from './hbs/reviews-list.hbs';
+
 // инклюдим scss файл
 import './style.scss';
 
 const popup = document.getElementById('popup');
 const closeBtn = document.getElementById('popup-header__close');
+const addBtn = document.getElementById('reviews-form__btn');
+const reviews = document.getElementById('reviews');
+
+const reviewsArr = [
+    {
+        id: '001',
+        date: '2018-12-02',
+        name: 'Odinokun',
+        place: 'Ocean Plasa',
+        review: 'Lorem ipsum dolor sit amet, ipsum dolor sit amet, consectetur adipisicing elit. Dolore, reiciendis!'
+    }, {
+        id: '001',
+        date: '2218-11-30',
+        name: 'I. Mask',
+        place: 'Marsian city',
+        review: 'Есть ли жизнь на Марсе? Нет ли жизни на Марсе? Науке это не известно.'
+    }, {
+        id: '002',
+        date: '2018-10-14',
+        name: 'Ozzy',
+        place: 'Ozzmozes',
+        review: 'Du hast mich'
+    }
+];
 
 const init = () => {
     // Создание карты.
@@ -18,18 +45,13 @@ const init = () => {
     myMap.events.add('click', async e => {
         const coords = e.get('coords');
         const coordsPosition = e.get('position');
-        
-        console.log(e);
 
         // открываем попап
         createPopup(coordsPosition[0], coordsPosition[1], popup);
+        // наполняем попап отзывами
+        reviews.innerHTML = reviewsListFn({ reviewsList: reviewsArr }); /////////temp!!!!!!!!!!!!!!!!!!
 
-        const placemark = new ymaps.Placemark(coords, {}, {
-            // Задаем стиль метки (метка в виде круга).
-            preset: "islands#circleDotIcon",
-            // Задаем цвет метки (в формате RGB).
-            iconColor: '#ff0000'
-        });
+        const placemark = new ymaps.Placemark(coords);
 
         // прослушка клика на маркере
         placemark.events.add('click', e => {
@@ -37,6 +59,10 @@ const init = () => {
         });
 
         // добавляем иконку на карту
+        // addBtn.addEventListener('click', e => {
+        //     e.preventDefault();
+        // });
+
         myMap.geoObjects.add(placemark);
 
         // geocode (адрес по клику)
@@ -52,7 +78,8 @@ const init = () => {
 ymaps.ready(init);
 
 
+
 // закрываем popup
 closeBtn.addEventListener('click', () => {
-    popup.style.display = 'none';
+    popup.classList.remove('active');
 });

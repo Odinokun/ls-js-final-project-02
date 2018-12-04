@@ -5,13 +5,20 @@
 }
 .popup {
   position: absolute;
-  display: none;
+  top: 0;
+  left: 0;
   overflow: hidden;
   width: 380px;
   height: 550px;
-  margin: auto;
+  transition: all .5s;
+  pointer-events: none;
+  opacity: 0;
   border-radius: 10px;
   background-color: #fff;
+  &.active {
+    pointer-events: auto;
+    opacity: 1;
+  }
 }
 .popup-header {
   display: flex;
@@ -32,8 +39,8 @@
   font-weight: 400;
   line-height: 1.4;
   margin-right: auto;
-  color: #fff;
   text-decoration: underline;
+  color: #fff;
   &:hover {
     text-decoration: none;
   }
@@ -61,8 +68,8 @@
   overflow-x: hidden;
   overflow-y: auto;
   height: 160px;
-  padding: 15px 15px 0 15px;
   margin-bottom: 25px;
+  padding: 15px 15px 0 15px;
 }
 .reviews-item {
   margin-bottom: 15px;
@@ -74,15 +81,15 @@
 .reviews-item__name {
   font-size: 16px;
   font-weight: 600;
+  font-style: italic;
   flex: none;
   width: 110px;
-  font-style: italic;
   padding-right: 5px;
   color: #4f4f4f;
 }
 .reviews-item__place {
-  font-weight: 600;
   font-size: 16px;
+  font-weight: 600;
   flex: none;
   max-width: 140px;
   color: #4f4f4f;
@@ -95,9 +102,9 @@
   color: #4f4f4f;
 }
 .reviews-item__text {
-  color: #4f4f4f;
   font-size: 15px;
   padding-top: 5px;
+  color: #4f4f4f;
 }
 // end reviews
 // begin reviews-form

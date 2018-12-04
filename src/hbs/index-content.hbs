@@ -26,23 +26,8 @@
   </header>
 
   <!-- begin reviews -->
-  <div class="reviews">
-    <div class="reviews-item">
-      <header class="reviews-item__header">
-        <span class="reviews-item__name">Svetlana</span>
-        <span class="reviews-item__place">Шоколадница</span>
-        <span class="reviews-item__time">2018-12-02</span>
-      </header>
-      <div class="reviews-item__text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolore, reiciendis!</div>
-    </div>
-    <div class="reviews-item">
-      <header class="reviews-item__header">
-        <span class="reviews-item__name">Odinokun</span>
-        <span class="reviews-item__place">Ocean Plaza</span>
-        <span class="reviews-item__time">2018-12-02</span>
-      </header>
-      <div class="reviews-item__text">Lorem ipsum dolor sit amet,  ipsum dolor sit amet, consectetur adipisicing elit. Dolore, reiciendis!</div>
-    </div>
+  <div class="reviews" id="reviews">
+    {{> "./reviews-list.hbs"}}
   </div>
   <!-- end reviews -->
 
@@ -53,7 +38,7 @@
       <input name="name" placeholder="Ваше имя">
       <input name="place" placeholder="Укажите место">
       <textarea class="textarea" name="comment" placeholder="Поделитесь впечатлениями"></textarea>
-      <button class="reviews-form__btn">Добавить</button>
+      <button class="reviews-form__btn" id="reviews-form__btn">Добавить</button>
     </form>
   </div>
   <!-- end reviews-form__wrap -->
