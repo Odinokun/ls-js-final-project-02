@@ -11,30 +11,36 @@ const popup = document.getElementById('popup');
 const closeBtn = document.getElementById('popup-header__close');
 const addBtn = document.getElementById('reviews-form__btn');
 const reviews = document.getElementById('reviews');
+const inputName = document.getElementById('reviews-form__input-name');
+const inputPlace = document.getElementById('reviews-form__input-place');
+const textarea = document.getElementById('reviews-form__textarea');
+const markers = [];
 
-const reviewsArr = [
-    {
-        id: '001',
-        date: '2018-12-02',
-        name: 'Odinokun',
-        place: 'Ocean Plasa',
-        review: 'Lorem ipsum dolor sit amet, ipsum dolor sit amet, consectetur adipisicing elit. Dolore, reiciendis!'
-    }, {
-        id: '001',
-        date: '2218-11-30',
-        name: 'I. Mask',
-        place: 'Marsian city',
-        review: 'Есть ли жизнь на Марсе? Нет ли жизни на Марсе? Науке это не известно.'
-    }, {
-        id: '002',
-        date: '2018-10-14',
-        name: 'Ozzy',
-        place: 'Ozzmozes',
-        review: 'Du hast mich'
-    }
+let reviewsArr = [
+    // {
+    //     id: '001',
+    //     date: '2018-12-02',
+    //     name: 'Odinokun',
+    //     place: 'Ocean Plasa',
+    //     review: 'Lorem ipsum dolor sit amet, ipsum dolor sit amet, consectetur adipisicing elit. Dolore, reiciendis!'
+    // }, {
+    //     id: '001',
+    //     date: '2218-11-30',
+    //     name: 'I. Mask',
+    //     place: 'Marsian city',
+    //     review: 'Есть ли жизнь на Марсе? Нет ли жизни на Марсе? Науке это не известно.'
+    // }, {
+    //     id: '002',
+    //     date: '2018-10-14',
+    //     name: 'Ozzy',
+    //     place: 'Ozzmozes',
+    //     review: 'Du hast mich'
+    // }
 ];
 
 const init = () => {
+    let coords;
+
     // Создание карты.
     const myMap = new ymaps.Map('map', {
         center: [50.450458, 30.523460],
@@ -43,7 +49,7 @@ const init = () => {
 
     // слушаем клики по карте
     myMap.events.add('click', async e => {
-        const coords = e.get('coords');
+        coords = e.get('coords');
         const coordsPosition = e.get('position');
 
         // открываем попап
@@ -53,18 +59,9 @@ const init = () => {
 
 
         // прослушка клика на маркере
-        // placemark.events.add('click', e => {
+        // marker.events.add('click', e => {
         //     console.log(e);
         // });
-
-        // добавляем иконку на карту
-        addBtn.addEventListener('click', e => {
-            e.preventDefault();
-
-            const placemark = new ymaps.Placemark(coords);
-            myMap.geoObjects.add(placemark);
-        });
-
 
         // geocode (адрес по клику)
         const data = await ymaps.geocode(coords);
@@ -74,10 +71,67 @@ const init = () => {
         popupHeaderTitle.innerText = address;
 
     });
+
+    
+    addBtn.addEventListener('click', e => {
+        e.preventDefault();
+        // уникальное число-id
+        let time = new Date().getTime();
+        let name = inputName.value;
+        let place = inputPlace.value;
+        let review = textarea.value;
+        let reviews;
+        
+
+
+        if (!name || !place || !review) {
+            alert('Заполните все поля формы!');
+        } else {
+            // добавляем маркер на карту
+            const marker = new ymaps.Placemark(coords);
+            myMap.geoObjects.add(marker);
+
+            // проверка на присутствие отзывов
+            if (marker.properties.get('reviews') === undefined) {
+                reviews = [];
+                console.log('0 - no reviews');
+            } else {
+                reviews = marker.properties.get('reviews');
+                console.log('1 - ', reviews);
+            }
+
+            // пушим в массив новый отзыв
+            reviews.push({name, place, review});
+            // перезаписываем в маркер новый массив отзывов
+            marker.properties.set('reviews', reviews);
+
+            // присваиваем ему уникальный id
+            // marker.properties.set('id', [time]);
+            // console.log(marker.properties.get('id', 'reviews'));
+            // console.log(marker.properties.get('reviews'));
+
+            // добавляем созданный маркер в массив
+            // markers.push(marker);
+
+            
+            // const testBtn = document.getElementById('test');
+            //
+            // testBtn.addEventListener('click', e => {
+            //     e.preventDefault();
+            //     console.log(marker.properties.get('reviews'));
+            // });
+
+            console.log('отправленный массив - ', marker.properties.get('reviews'));
+
+            //очищаем поля ввода
+            inputName.value = '';
+            inputPlace.value = '';
+            textarea.value = '';
+        }
+    });
 };
 
 ymaps.ready(init);
-
 
 
 // закрываем popup
