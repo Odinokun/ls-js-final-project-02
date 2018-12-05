@@ -55,7 +55,7 @@ const init = () => {
         // открываем попап
         createPopup(coordsPosition[0], coordsPosition[1], popup);
         // наполняем попап отзывами
-        reviews.innerHTML = reviewsListFn({ reviewsList: reviewsArr }); /////////temp!!!!!!!!!!!!!!!!!!
+        // reviews.innerHTML = reviewsListFn({ reviewsList: reviewsArr }); /////////temp!!!!!!!!!!!!!!!!!!
 
 
         // прослушка клика на маркере
@@ -80,7 +80,7 @@ const init = () => {
         let name = inputName.value;
         let place = inputPlace.value;
         let review = textarea.value;
-        let reviews;
+        let reviewsArr;
         
 
 
@@ -93,33 +93,24 @@ const init = () => {
 
             // проверка на присутствие отзывов
             if (marker.properties.get('reviews') === undefined) {
-                reviews = [];
+                reviewsArr = [];
                 console.log('0 - no reviews');
             } else {
-                reviews = marker.properties.get('reviews');
-                console.log('1 - ', reviews);
+                reviewsArr = marker.properties.get('reviews');
+                console.log('1 - ', reviewsArr);
             }
 
             // пушим в массив новый отзыв
-            reviews.push({name, place, review});
+            reviewsArr.push({name, place, review});
             // перезаписываем в маркер новый массив отзывов
-            marker.properties.set('reviews', reviews);
+            marker.properties.set('reviews', reviewsArr);
+            // заполняем попап отзывами
+            reviews.innerHTML = reviewsListFn({ reviewsList: reviewsArr });
 
             // присваиваем ему уникальный id
             // marker.properties.set('id', [time]);
-            // console.log(marker.properties.get('id', 'reviews'));
-            // console.log(marker.properties.get('reviews'));
-
             // добавляем созданный маркер в массив
             // markers.push(marker);
-
-            
-            // const testBtn = document.getElementById('test');
-            //
-            // testBtn.addEventListener('click', e => {
-            //     e.preventDefault();
-            //     console.log(marker.properties.get('reviews'));
-            // });
 
             console.log('отправленный массив - ', marker.properties.get('reviews'));
 
