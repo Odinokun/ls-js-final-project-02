@@ -158,3 +158,62 @@
   background-color: #ff8663;
 }
 // end reviews-form
+
+// begin success-alert
+.success-alert__layout {
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all .5s;
+  pointer-events: none;
+  opacity: 0;
+  background-color: rgba(255, 134, 99, .6);
+  &.active {
+    pointer-events: auto;
+    opacity: 1;
+  }
+}
+.success-alert {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: none;
+  width: 400px;
+  height: 150px;
+  padding: 30px 20px;
+  text-align: center;
+  border-radius: 10px;
+  background-color: #fff;
+}
+.success-alert__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  margin-left: 10px;
+  svg {
+    display: block;
+    fill: #ff8663;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    transition: transform .5s;
+  }
+  &:hover {
+    svg {
+      transform: rotate(180deg);
+    }
+  }
+}
+.success-alert__title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #ff8663;
+}
+// end success-alert
