@@ -10,19 +10,18 @@ import './style.scss';
 const popup = document.getElementById('popup');
 const popupCloseBtn = document.getElementById('popup-header__close');
 const addBtn = document.getElementById('reviews-form__btn');
-const inputName = document.getElementById('reviews-form__input-name');
-const inputPlace = document.getElementById('reviews-form__input-place');
-const textarea = document.getElementById('reviews-form__textarea');
 const popupSuccess = document.getElementById('success-alert__layout');
 const successCloseBtn = document.getElementById('success-alert__close');
 
-const reviewsBlock = document.getElementById('reviews');
-const reviewsBlockId = reviewsBlock.getAttribute('data-id');
+let inputName = document.getElementById('reviews-form__input-name');
+let inputPlace = document.getElementById('reviews-form__input-place');
+let textarea = document.getElementById('reviews-form__textarea');
 
-const markersArr = []; // массив с маркерами и координатами
-let reviewsArr = []; // массив с отзывами для попапа
+const reviewsBlock = document.getElementById('reviews');
+
+let time = new Date().getTime(); // уникальное число-id
+let markersArr = []; // массив с маркерами, координатами и отзывами
 let coords; // координаты клика/маркера
-// let marker;
 
 const init = () => {
 
@@ -34,74 +33,144 @@ const init = () => {
 
     // слушаем клики по карте
     myMap.events.add('click', async e => {
-        coords = e.get('coords');
-        const coordsPosition = e.get('position');
-
+        coords = e.get('coords'); // координаты клика (географические)
+        let coordsPosition = e.get('position'); // координаты клика (относительно окна)
+        
+        // выводим адрес в шапке попапа
+        geocodeAddress(coords);
         // открываем попап с надписью про отсутствие отзывов
         createPopup(coordsPosition[0], coordsPosition[1], popup);
         reviewsBlock.innerHTML = "Пока отзывов нет!!!";
-
-
-        // geocode (адрес по клику)
-        const dataAddress = await ymaps.geocode(coords);
-        const popupHeaderTitle = document.getElementById('popup-header__title');
-        // выводим адрес в шапке popup
-        popupHeaderTitle.innerText = dataAddress.geoObjects.get(0).properties.get('metaDataProperty').GeocoderMetaData.Address.formatted;
-
-        // // прослушка клика на маркере
-        // marker.events.add('click', e => {
-        //     console.log(e);
-        // });
     });
 
-    // слушаем клики по кнопке "Добавить" при первом отзыве
+    // слушаем клики по маркерам
+    myMap.geoObjects.events.add('click', e => {
+        let coordsPosition = e.get('position'); // координаты клика (относительно окна)
+        coords =  e.get('target').geometry._coordinates; // координаты текущего маркера
+
+        // перебираем массив маркеров и ищем совпадение по координатам
+        markersArr.forEach(function(item) {
+            if (item.coords === coords) {
+                // заполняем попап отзывами
+                reviewsBlock.innerHTML = reviewsListFn({ reviewsList: item.reviews });
+            }
+        });
+        // выводим адрес в шапке попапа
+        geocodeAddress(coords);
+
+        // открываем попап
+        createPopup(coordsPosition[0], coordsPosition[1], popup);
+    });
+
+    // слушаем клики по кнопке "Добавить"
     addBtn.addEventListener('click', e => {
         e.preventDefault();
-        // уникальное число-id
-        let time = new Date().getTime();
 
-        let name = inputName.value;
-        let place = inputPlace.value;
-        let review = textarea.value;
-
-        if (!name || !place || !review) {
+        if (!inputName.value || !inputPlace.value || !textarea.value) {
             alert('Заполните все поля формы!');
-        } else if (!reviewsBlockId) {
-            // создаем новый маркер
-            const marker = new ymaps.Placemark(coords);
-            // присваиваем ему уникальный id
-            marker.properties.set('id', [time]);
-            // добавляем маркер на карту
-            myMap.geoObjects.add(marker);
-            // добавляем созданный маркер в массив
-            markersArr.push({
-                id: marker.properties.get('id'),
-                coords: coords
+        } else {
+            let count = 0;
+            // перебираем массив маркеров и ищем совпадение по координатам
+            markersArr.forEach(function(item) {
+                if (item.coords === coords) {
+                    count++;
+                }
             });
 
-            let tempArr = [{name, place, review}];
-            // записываем в маркер массив из данных формы отзывов
-            marker.properties.set('reviews', tempArr);
-            // заполняем попап отзывами
-            reviewsBlock.innerHTML = reviewsListFn({ reviewsList: tempArr });
-            popupSuccess.classList.add('active');
-            //скрываем все попапы
-            setTimeout( () => {
-                popup.classList.remove('active');
-                popupSuccess.classList.remove('active');
-            }, 2000);
-
-            //очищаем поля ввода
-            inputName.value = '';
-            inputPlace.value = '';
-            textarea.value = '';
+            if (count === 0) { //если не нашли совпадения
+                // создаем новый маркер
+                let marker = new ymaps.Placemark(coords);
+                saveFirstReview(marker);
+                //очищаем поля ввода
+                clearForm();
+            } else { //если совпадения есть
+                saveNextReviews();
+                //очищаем поля ввода
+                clearForm();
+            }
         }
-
     });
 
+    // сохранение первого отзыва
+    function saveFirstReview(marker) {
+        // добавляем маркер на карту
+        myMap.geoObjects.add(marker);
+
+        // создаем массив с данными из формы
+        let formDataArr = [{
+            name: inputName.value,
+            place: inputPlace.value,
+            review: textarea.value
+        }];
+
+        // добавляем созданный маркер в массив маркеров
+        markersArr.push({
+            id: marker.properties.get('id'),
+            coords: coords,
+            reviews: formDataArr
+        });
+
+        // заполняем попап отзывами
+        reviewsBlock.innerHTML = reviewsListFn({ reviewsList: formDataArr });
+        popupSuccess.classList.add('active');
+        //скрываем все попапы
+        setTimeout( () => {
+            popup.classList.remove('active');
+            popupSuccess.classList.remove('active');
+        }, 1500);
+    }
+
+    // сохранение последующих отзывов
+    function saveNextReviews() {
+        // создаем массив с данными из формы
+        let formDataArr = [{
+            name: inputName.value,
+            place: inputPlace.value,
+            review: textarea.value
+        }];
+
+        // перебираем массив маркеров и ищем совпадение по координатам
+        markersArr.forEach(function(item) {
+            if (item.coords === coords) {
+                // добавляем новые отзывы к старым
+                item.reviews = item.reviews.concat(formDataArr);
+            }
+        });
+
+        // перебираем массив маркеров и ищем совпадение по координатам
+        markersArr.forEach(function(item) {
+            if (item.coords === coords) {
+                // заполняем попап отзывами
+                reviewsBlock.innerHTML = reviewsListFn({ reviewsList: item.reviews });
+            }
+        });
+
+        popupSuccess.classList.add('active');
+        //скрываем все попапы
+        setTimeout( () => {
+            popup.classList.remove('active');
+            popupSuccess.classList.remove('active');
+        }, 1500);
+    }
 };
 
 ymaps.ready(init);
+
+// определение адреса по координатам
+async function geocodeAddress(xxx) {
+    // geocode (определяем адрес по координатам клика)
+    const dataAddress = await ymaps.geocode(xxx);
+    const popupHeaderTitle = document.getElementById('popup-header__title');
+    // выводим адрес в шапке popup
+    popupHeaderTitle.innerText = dataAddress.geoObjects.get(0).properties.get('metaDataProperty').GeocoderMetaData.Address.formatted;
+}
+
+// очистка полей формы
+function clearForm() {
+    inputName.value = '';
+    inputPlace.value = '';
+    textarea.value = '';
+}
 
 // закрываем popup
 popupCloseBtn.addEventListener('click', () => {
@@ -110,6 +179,5 @@ popupCloseBtn.addEventListener('click', () => {
 
 // закрываем success
 successCloseBtn.addEventListener('click', () => {
-    popup.classList.remove('active');
     popupSuccess.classList.remove('active');
 });
