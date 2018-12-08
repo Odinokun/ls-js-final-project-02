@@ -5,13 +5,20 @@
 }
 .popup {
   position: absolute;
-  display: none;
+  top: 0;
+  left: 0;
   overflow: hidden;
   width: 380px;
   height: 550px;
-  margin: auto;
+  transition: all .5s;
+  pointer-events: none;
+  opacity: 0;
   border-radius: 10px;
   background-color: #fff;
+  &.active {
+    pointer-events: auto;
+    opacity: 1;
+  }
 }
 .popup-header {
   display: flex;
@@ -32,8 +39,8 @@
   font-weight: 400;
   line-height: 1.4;
   margin-right: auto;
-  color: #fff;
   text-decoration: underline;
+  color: #fff;
   &:hover {
     text-decoration: none;
   }
@@ -61,8 +68,8 @@
   overflow-x: hidden;
   overflow-y: auto;
   height: 160px;
-  padding: 15px 15px 0 15px;
   margin-bottom: 25px;
+  padding: 15px 15px 0 15px;
 }
 .reviews-item {
   margin-bottom: 15px;
@@ -74,15 +81,15 @@
 .reviews-item__name {
   font-size: 16px;
   font-weight: 600;
+  font-style: italic;
   flex: none;
   width: 110px;
-  font-style: italic;
   padding-right: 5px;
   color: #4f4f4f;
 }
 .reviews-item__place {
-  font-weight: 600;
   font-size: 16px;
+  font-weight: 600;
   flex: none;
   max-width: 140px;
   color: #4f4f4f;
@@ -95,11 +102,12 @@
   color: #4f4f4f;
 }
 .reviews-item__text {
-  color: #4f4f4f;
   font-size: 15px;
   padding-top: 5px;
+  color: #4f4f4f;
 }
 // end reviews
+
 // begin reviews-form
 .reviews-form__wrap {
   position: relative;
@@ -150,3 +158,62 @@
   background-color: #ff8663;
 }
 // end reviews-form
+
+// begin success-alert
+.success-alert__layout {
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all .5s;
+  pointer-events: none;
+  opacity: 0;
+  background-color: rgba(255, 134, 99, .6);
+  &.active {
+    pointer-events: auto;
+    opacity: 1;
+  }
+}
+.success-alert {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: none;
+  width: 400px;
+  height: 150px;
+  padding: 30px 20px;
+  text-align: center;
+  border-radius: 10px;
+  background-color: #fff;
+}
+.success-alert__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  margin-left: 10px;
+  svg {
+    display: block;
+    fill: #ff8663;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    transition: transform .5s;
+  }
+  &:hover {
+    svg {
+      transform: rotate(180deg);
+    }
+  }
+}
+.success-alert__title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #ff8663;
+}
+// end success-alert
