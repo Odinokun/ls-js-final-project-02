@@ -44,7 +44,9 @@ const init = () => {
         // Элементами панели навигации будут маркеры.
         clusterBalloonPagerType: "marker",
         // Количество элементов в панели.
-        clusterBalloonPagerSize: 6
+        clusterBalloonPagerSize: 6,
+        // не скрывать маркер при всплытии балуна
+        hideIconOnBalloonOpen: false
     });
     myMap.geoObjects.add(clusterer); // добавляем кластеризатор на карту
 
@@ -63,9 +65,7 @@ const init = () => {
     // слушаем клики по геообъектам
     myMap.geoObjects.events.add('click', e => {
         if (e.get('target').options._name === 'geoObject') {
-            console.log(e.get('target'));
-
-            e.get('target').balloon.destroy(); // отменяем всплытие балуна
+            e.preventDefault(); // отменяем всплытие балуна
 
             let coordsPosition = e.get('position'); // координаты клика (относительно окна)
             coords =  e.get('target').geometry._coordinates; // координаты текущего маркера
@@ -79,6 +79,7 @@ const init = () => {
             });
             // выводим адрес в шапке попапа
             geocodeAddress(coords);
+
 
             // открываем попап
             createPopup(coordsPosition[0], coordsPosition[1], popup);
@@ -105,9 +106,7 @@ const init = () => {
 
             if (count === 0) { //если не нашли совпадения
                 // создаем новый маркер
-                let marker = new ymaps.Placemark(coords, {
-                    iconContent: '111111'
-                });
+                let marker = new ymaps.Placemark(coords);
 
                 saveFirstReview(marker);
                 //очищаем поля ввода
@@ -125,8 +124,6 @@ const init = () => {
         // добавляем маркер на карту
         // myMap.geoObjects.add(marker);
         
-        // console.log(marker);
-
         // создаем массив с данными из формы
         let formDataArr = [{
             name: inputName.value,
@@ -144,8 +141,9 @@ const init = () => {
         let objectMarker = new ymaps.GeoObject({
             geometry: { type: "Point", coordinates: coords },
             properties: {
-                clusterCaption: inputPlace.value,
-                balloonContentBody: textarea.value
+                balloonContentHeader: inputPlace.value,
+                balloonContentBody: textarea.value,
+                balloonContentFooter: 'address'
             }
         });
 
