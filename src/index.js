@@ -23,13 +23,30 @@ let time = new Date().getTime(); // уникальное число-id
 let markersArr = []; // массив с маркерами, координатами и отзывами
 let coords; // координаты клика/маркера
 
-const init = () => {
+let myGeoObjects = []; // Создадим массив геообъектов.
 
+const init = () => {
     // Создание карты.
     const myMap = new ymaps.Map('map', {
         center: [50.450458, 30.523460],
         zoom: 16
     });
+
+    // Создадим кластеризатор.
+    let clusterer = new ymaps.Clusterer({
+        // запретим приближать карту при клике на кластеры
+        clusterDisableClickZoom: true,
+        // Используем макет "карусель"
+        clusterBalloonContentLayout: "cluster#balloonCarousel",
+        // Запрещаем зацикливание списка при постраничной навигации.
+        clusterBalloonCycling: false,
+        // Настройка внешнего вида панели навигации.
+        // Элементами панели навигации будут маркеры.
+        clusterBalloonPagerType: "marker",
+        // Количество элементов в панели.
+        clusterBalloonPagerSize: 6
+    });
+    myMap.geoObjects.add(clusterer); // добавляем кластеризатор на карту
 
     // слушаем клики по карте
     myMap.events.add('click', async e => {
@@ -43,23 +60,32 @@ const init = () => {
         reviewsBlock.innerHTML = "Пока отзывов нет!!!";
     });
 
-    // слушаем клики по маркерам
+    // слушаем клики по геообъектам
     myMap.geoObjects.events.add('click', e => {
-        let coordsPosition = e.get('position'); // координаты клика (относительно окна)
-        coords =  e.get('target').geometry._coordinates; // координаты текущего маркера
+        if (e.get('target').options._name === 'geoObject') {
+            console.log(e.get('target'));
 
-        // перебираем массив маркеров и ищем совпадение по координатам
-        markersArr.forEach(function(item) {
-            if (item.coords === coords) {
-                // заполняем попап отзывами
-                reviewsBlock.innerHTML = reviewsListFn({ reviewsList: item.reviews });
-            }
-        });
-        // выводим адрес в шапке попапа
-        geocodeAddress(coords);
+            e.get('target').balloon.destroy(); // отменяем всплытие балуна
 
-        // открываем попап
-        createPopup(coordsPosition[0], coordsPosition[1], popup);
+            let coordsPosition = e.get('position'); // координаты клика (относительно окна)
+            coords =  e.get('target').geometry._coordinates; // координаты текущего маркера
+
+            // перебираем массив маркеров и ищем совпадение по координатам
+            markersArr.forEach(function(item) {
+                if (item.coords === coords) {
+                    // заполняем попап отзывами
+                    reviewsBlock.innerHTML = reviewsListFn({ reviewsList: item.reviews });
+                }
+            });
+            // выводим адрес в шапке попапа
+            geocodeAddress(coords);
+
+            // открываем попап
+            createPopup(coordsPosition[0], coordsPosition[1], popup);
+        } else if (e.get('target').options._name === 'cluster') {
+            console.log('this is cluster');
+        }
+
     });
 
     // слушаем клики по кнопке "Добавить"
@@ -79,7 +105,10 @@ const init = () => {
 
             if (count === 0) { //если не нашли совпадения
                 // создаем новый маркер
-                let marker = new ymaps.Placemark(coords);
+                let marker = new ymaps.Placemark(coords, {
+                    iconContent: '111111'
+                });
+
                 saveFirstReview(marker);
                 //очищаем поля ввода
                 clearForm();
@@ -94,7 +123,9 @@ const init = () => {
     // сохранение первого отзыва
     function saveFirstReview(marker) {
         // добавляем маркер на карту
-        myMap.geoObjects.add(marker);
+        // myMap.geoObjects.add(marker);
+        
+        // console.log(marker);
 
         // создаем массив с данными из формы
         let formDataArr = [{
@@ -109,6 +140,17 @@ const init = () => {
             coords: coords,
             reviews: formDataArr
         });
+
+        let objectMarker = new ymaps.GeoObject({
+            geometry: { type: "Point", coordinates: coords },
+            properties: {
+                clusterCaption: inputPlace.value,
+                balloonContentBody: textarea.value
+            }
+        });
+
+        myMap.geoObjects.add(objectMarker);
+        clusterer.add(objectMarker);
 
         // заполняем попап отзывами
         reviewsBlock.innerHTML = reviewsListFn({ reviewsList: formDataArr });
