@@ -121,9 +121,6 @@ const init = () => {
 
     // сохранение первого отзыва
     function saveFirstReview(marker) {
-        // добавляем маркер на карту
-        // myMap.geoObjects.add(marker);
-        
         // создаем массив с данными из формы
         let formDataArr = [{
             name: inputName.value,
@@ -142,8 +139,8 @@ const init = () => {
             geometry: { type: "Point", coordinates: coords },
             properties: {
                 balloonContentHeader: inputPlace.value,
-                balloonContentBody: textarea.value,
-                balloonContentFooter: 'address'
+                balloonContentBody: 'address',
+                balloonContentFooter: textarea.value
             }
         });
 
