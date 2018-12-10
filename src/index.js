@@ -19,11 +19,9 @@ let textarea = document.getElementById('reviews-form__textarea');
 
 const reviewsBlock = document.getElementById('reviews');
 
-let time = new Date().getTime(); // уникальное число-id
 let markersArr = []; // массив с маркерами, координатами и отзывами
 let coords; // координаты клика/маркера
-
-let myGeoObjects = []; // Создадим массив геообъектов.
+let coordsPosition; // координаты клика (относительно окна)
 
 const init = () => {
     // Создание карты.
@@ -53,7 +51,7 @@ const init = () => {
     // слушаем клики по карте
     myMap.events.add('click', async e => {
         coords = e.get('coords'); // координаты клика (географические)
-        let coordsPosition = e.get('position'); // координаты клика (относительно окна)
+        coordsPosition = e.get('position'); // координаты клика (относительно окна)
         
         // выводим адрес в шапке попапа
         geocodeAddress(coords);
@@ -83,10 +81,7 @@ const init = () => {
 
             // открываем попап
             createPopup(coordsPosition[0], coordsPosition[1], popup);
-        } else if (e.get('target').options._name === 'cluster') {
-            console.log('this is cluster');
         }
-
     });
 
     // слушаем клики по кнопке "Добавить"
@@ -107,6 +102,10 @@ const init = () => {
             if (count === 0) { //если не нашли совпадения
                 // создаем новый маркер
                 let marker = new ymaps.Placemark(coords);
+                // добавляем ему адрес
+                const popupHeaderTitleText = document.getElementById('popup-header__title').textContent;
+                marker.properties.set('address', popupHeaderTitleText);
+                marker.properties.set('coord', coords);
 
                 saveFirstReview(marker);
                 //очищаем поля ввода
@@ -121,9 +120,6 @@ const init = () => {
 
     // сохранение первого отзыва
     function saveFirstReview(marker) {
-        // добавляем маркер на карту
-        // myMap.geoObjects.add(marker);
-        
         // создаем массив с данными из формы
         let formDataArr = [{
             name: inputName.value,
@@ -138,12 +134,15 @@ const init = () => {
             reviews: formDataArr
         });
 
+        // выковыриваем адрес из маркера
+        let address = marker.properties.get('address');
+
         let objectMarker = new ymaps.GeoObject({
             geometry: { type: "Point", coordinates: coords },
             properties: {
-                balloonContentHeader: inputPlace.value,
-                balloonContentBody: textarea.value,
-                balloonContentFooter: 'address'
+                balloonContentHeader: '<span>' + inputPlace.value + '</span>',
+                balloonContentBody: '<span data-coords="'+ coords +'" class="myLink">' + address + '</span>',
+                balloonContentFooter: '<span>' + textarea.value + '</span>'
             }
         });
 
@@ -174,13 +173,6 @@ const init = () => {
             if (item.coords === coords) {
                 // добавляем новые отзывы к старым
                 item.reviews = item.reviews.concat(formDataArr);
-            }
-        });
-
-        // перебираем массив маркеров и ищем совпадение по координатам
-        markersArr.forEach(function(item) {
-            if (item.coords === coords) {
-                // заполняем попап отзывами
                 reviewsBlock.innerHTML = reviewsListFn({ reviewsList: item.reviews });
             }
         });
@@ -192,6 +184,25 @@ const init = () => {
             popupSuccess.classList.remove('active');
         }, 1500);
     }
+
+    let myMapClick = document.getElementById('map');
+    myMapClick.addEventListener('click', e => {
+        if (e.target.classList.contains('myLink')) {
+            let balloonCoords = e.target.getAttribute('data-coords');
+            // выводим адрес в шапке попапа
+            geocodeAddress(balloonCoords);
+
+            // перебираем массив маркеров и ищем совпадение по координатам
+            markersArr.forEach(function(item) {
+                if (item.coords == balloonCoords) {
+                    reviewsBlock.innerHTML = reviewsListFn({ reviewsList: item.reviews });
+                }
+            });
+
+            // открываем попап
+            createPopup(coordsPosition[0], coordsPosition[1], popup);
+        }
+    })
 };
 
 ymaps.ready(init);
